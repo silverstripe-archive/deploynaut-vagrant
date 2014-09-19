@@ -13,24 +13,24 @@ directory of this folder, i.e.
 
 ## deploynaut server
 
-SSH Access: `vagrant ssh deploynaut`
-hostname: deploynaut
-Internal ip address: 10.0.1.2
-http://localhost:8080/
+ * SSH Access: `vagrant ssh deploynaut`
+ * hostname: deploynaut
+ * Internal ip address: 10.0.1.2
+ * http://localhost:8080/
 
 ## uat server
 
-SSH Access: `vagrant ssh uat`
-hostname: uat
-Internal ip address: 10.0.1.3
-http://localhost:8081/
+ * SSH Access: `vagrant ssh uat`
+ * hostname: uat
+ * Internal ip address: 10.0.1.3
+ * http://localhost:8081/
 
 ## prod
 
-SSH Access: `vagrant ssh prod`
-hostname: prod
-Internal ip address: 10.0.1.4
-http://localhost:8082/
+ * SSH Access: `vagrant ssh prod`
+ * hostname: prod
+ * Internal ip address: 10.0.1.4
+ * http://localhost:8082/
 
 Even though it's more common to use puppet or chef scripts to setup the actual environments, they
 require access to puppet modules or chef recipes and in some cases a working puppet master or chef master.
