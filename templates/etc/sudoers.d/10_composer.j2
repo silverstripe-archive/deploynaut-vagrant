@@ -1,0 +1,6 @@
+Defaults>composer env_reset
+Defaults>composer env_keep += "IDENT_KEY GIT_SSH COMPOSER_PROCESS_TIMEOUT HTTP_PROXY HTTPS_PROXY"
+Defaults>composer umask_override
+Defaults>composer umask = 002
+
+www-data ALL=(composer) NOPASSWD:ALL

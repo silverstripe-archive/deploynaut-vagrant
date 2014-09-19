@@ -1,0 +1,178 @@
+---
+- hosts: all
+  sudo: yes
+  vars:
+    document_root: /sites/mysite/www/
+  tasks:
+    - apt: pkg={{ item }} state=latest
+      with_items:
+        - vim
+        - git
+        - tar
+        - apache2
+        - php5
+        - mysql-server
+
+    - name: install apache modules
+      apache2_module: state=present name={{ item }}
+      with_items:
+        - rewrite
+        - vhost_alias
+        - headers
+        - expires
+        - filter
+      notify: restart apache
+
+    - name: install php5 Packages
+      sudo: yes
+      apt: pkg={{ item }} state=present
+      with_items:
+        - "php-apc"
+        - "php5-cli"
+        - "php5-curl"
+        - "php5-imagick"
+        - "php5-gd"
+        - "php5-imap"
+        - "php5-ldap"
+        - "php5-mcrypt"
+        - "php5-tidy"
+        - "php5-mysql"
+        - "php5-sqlite"
+      notify: restart apache
+
+    - name: create web folders
+      file: state=directory path=/sites/mysite/{{ item }} owner=www-data group=www-data mode=2775
+      with_items:
+        - logs
+        - shared/assets
+
+    - name: set default vhost
+      template: src=templates/etc/apache2/sites-available/default.j2 dest=/etc/apache2/sites-available/default
+      notify: restart apache
+
+    - name: add composer group
+      group: name=composer state=present
+
+    - name: add composer user
+      user: name=composer state=present group=composer generate_ssh_key=yes
+
+    - name: set no strict host checking for the composer user on github repos
+      copy: dest=/home/composer/.ssh/config content="Host github.com\n\tStrictHostKeyChecking no\n"
+
+    - name: php.display_errors = on
+      ini_file: dest=/etc/php5/{{ item }}/php.ini section=PHP option=display_errors value="On" backup=yes state=present
+      with_items:
+        - apache2
+        - cli
+      notify: restart apache
+
+    - name: php.display_startup_errors = on
+      ini_file: dest=/etc/php5/{{ item }}/php.ini section=PHP option=display_startup_errors value="On" backup=yes state=present
+      with_items:
+        - apache2
+        - cli
+      notify: restart apache
+
+    - name: php.suhosin allow .phar files
+      ini_file: dest=/etc/php5/{{ item }}/php.ini section=suhosin option=suhosin.executor.include.whitelist value=phar state=present
+      with_items:
+        - apache2
+        - cli
+      notify: restart apache
+
+    - name: download sspak
+      get_url: url=http://silverstripe.github.io/sspak/sspak.phar dest=/usr/bin/sspak mode=0777
+
+  handlers:
+    - name: restart apache
+      service: name=apache2 state=restarted
+
+    - name: restart mysql
+      service: name=mysql state=restarted
+
+- hosts: deploy
+  sudo: yes
+  vars:
+    document_root: /sites/mysite/www/
+    is_deploynaut: true
+  tasks:
+
+    - name: install composer
+      shell: curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer creates=/usr/local/bin/composer
+
+    - name: install ruby and rediss
+      apt: pkg={{ item }} state=latest
+      with_items:
+        - ruby1.8
+        - redis-server
+
+    - name: install gem capistrano
+      gem: name=capistrano version=2.15.5 state=present user_install=no
+
+    - name: install gem capistrano-multiconfig
+      gem: name=capistrano-multiconfig version=0.0.4 state=present user_install=no
+
+    - name: install resque gem
+      gem: name=resque state=present user_install=no
+
+    - name: symlink gem binaries to /usr/bin
+      file: state=link src=/var/lib/gems/1.8/bin/{{ item }} dest=/usr/bin/{{ item }}
+      with_items:
+        - cap
+        - capify
+        - resque-web
+
+    - name: setup the PHP Resque init script
+      template: src=templates/etc/init.d/php-resque dest=/etc/init.d/php-resque mode=0777
+      notify: restart php-resque
+
+    - name: Start resque-web at port 5678
+      shell: if ! netstat -nat | grep 5678; then nohup /usr/bin/resque-web > /tmp/resque-web.log & fi;
+
+    - name: set up deploynaut _ss_environment.php
+      template: src=templates/sites/mysite/_ss_environment.php.j2 dest=/sites/mysite/_ss_environment.php owner=www-data group=www-data mode=0666
+
+    - name: allow www-data to sudo to composer
+      template: src=templates/etc/sudoers.d/10_composer.j2 dest=/etc/sudoers.d/10_composer mode=0440
+
+    - name: create deploynaut web folders
+      file: state=directory path=/sites/mysite/{{ item }} owner=www-data group=composer mode=2775
+      with_items:
+        - git-clones
+        - deploynaut-resources/envs
+        - www-keys
+
+    - name: copy www ssh keys
+      copy: src=files/www_{{ item }} dest=/sites/mysite/www-keys/{{ item }} mode=0600 owner=www-data group=www-data
+      with_items:
+        - id_rsa
+        - id_rsa.pub
+      notify: restart apache
+
+  handlers:
+    - name: restart php-resque
+      service: name=php-resque enabled=yes state=restarted
+
+    - name: restart apache
+      service: name=apache2 state=restarted
+
+- hosts: web
+  sudo: yes
+  vars:
+    is_deploynaut: false
+  tasks:
+    - name: add sites user
+      user: name=sites state=present group=www-data
+
+    - name: set up release folder
+      file: state=directory path=/sites/mysite/releases owner=www-data group=www-data mode=2775
+
+    - name: add deploynaut www public key to sites users
+      authorized_key:
+        user=sites
+        key="{{ lookup('file', 'files/www_id_rsa.pub') }}"
+        manage_dir=yes
+        state=present
+
+    - name: set up web _ss_environment.php
+      template: src=templates/sites/mysite/_ss_environment.php.j2 dest=/sites/mysite/_ss_environment.php owner=www-data group=www-data mode=0666

@@ -1,0 +1,22 @@
+<?php
+/*
+ * {{ ansible_managed }}
+ */
+
+define('SS_ENVIRONMENT_TYPE', 'dev');
+
+define('SS_DATABASE_SERVER', 'localhost');
+define('SS_DATABASE_USERNAME', 'root');
+define('SS_DATABASE_PASSWORD', '');
+define('SS_DATABASE_NAME', 'deploynaut');
+
+define('SS_DEFAULT_ADMIN_USERNAME', 'admin');
+define('SS_DEFAULT_ADMIN_PASSWORD', 'password');
+
+{% if is_deploynaut | mandatory %}
+define('DEPLOYNAUT_LOG_PATH','/sites/mysite/logs/deploynaut');
+define('DEPLOYNAUT_LOCAL_VCS_PATH', '/sites/mysite/git-clones');
+define('DEPLOYNAUT_ENV_ROOT', '/sites/mysite/deploynaut-resources/envs');
+define('DEPLOYNAUT_SSH_KEY', '/sites/mysite/www-keys/id_rsa');
+define('FLAG_SNAPSHOTS_ENABLED', true);
+{% endif %}

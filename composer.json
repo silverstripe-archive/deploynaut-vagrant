@@ -1,0 +1,7 @@
+{
+	"name": "silverstripe/deploynaut-vagrant",
+	"type": "silverstripe-module",
+	"description": "Helps setting up a developer environment for silverstripe/deploynaut",
+	"license": "BSD-3-Clause",
+	"keywords": ["silverstripe", "module", "vagrant", "deploynaut"]
+}
