@@ -8,8 +8,8 @@ On a `vagrant up` and `vagrant provision` it will setup three SS LAMP stacks.
 Notice that all vagrant commands have to be prepended with a system environment variable that points to the
 directory of this folder, i.e.
 
-    VAGRANT_CWD=ansible/ vagrant up
-    VAGRANT_CWD=ansible/ vagrant provision
+    VAGRANT_CWD=deploynaut-vagrant/ vagrant up
+    VAGRANT_CWD=deploynaut-vagrant/ vagrant provision
 
 ## deploynaut server
 
