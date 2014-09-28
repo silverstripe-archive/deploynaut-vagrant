@@ -1,9 +1,6 @@
 # Vagrant / Ansible test bench
 
-This is a SilverStripe module providing virtualbox VMs that sets up development environments for developing the [deploynuat](https://github.com/silverstripe/deploynaut) module.
-
-
-This module contains the Ansible provisioning scripts that used within a `VagrantFile`.
+This is a SilverStripe module that provides an automated setup of a dev environment for the [deploynuat](https://github.com/silverstripe/deploynaut) module by using virtualbox, vagrant and ansible.
 
 ## System requirements
 
@@ -12,70 +9,66 @@ On your development machine you will need:
  * [Virtualbox](https://www.virtualbox.org/)
  * [Vagrant](https://www.vagrantup.com/)
  * [Ansible](http://docs.ansible.com/intro_installation.html)
+
+To install ansible on Mac OS X you can install it in numerous ways, e.g
+
+	sudo pip install ansible
  
 ## Installation
 
-Install the module with composer
+It is meant to be installed in a project that already have deploynaut installed, see the [deploynaut installation instructions](https://github.com/silverstripe/deploynaut/blob/master/docs/en/index.md#deploynaut-1). Please note that you will **not** be required to install capistrano or php-resque, just the source code for the project.
 
-   composer require --dev "silverstripe/deploynaut-vagrant:*"
-  
-On a `vagrant up` and `vagrant provision` it will setup three SS LAMP stacks.
+Install this module to your current deploynaut project with composer:
 
-Notice that all vagrant commands have to be prepended with a system environment variable that points to the
-directory of this folder, i.e.
+	$ composer require --dev "silverstripe/deploynaut-vagrant:*"
 
-    VAGRANT_CWD=deploynaut-vagrant/ vagrant up
-    VAGRANT_CWD=deploynaut-vagrant/ vagrant provision
+Start the virtual machines from the root of the project from a terminal:
+
+	$ VAGRANT_CWD=deploynaut-vagrant/ vagrant up
+
+> Notice that all vagrant commands have to be prepended with a system environment variable that points to the
+> directory of this folder, i.e.
+> 
+>     VAGRANT_CWD=deploynaut-vagrant/ vagrant up
+>     VAGRANT_CWD=deploynaut-vagrant/ vagrant provision
+
+On `vagrant up` the vagrant will start three virtualbox machines and use ansible to install the necessary software for running one deploynaut site and two generic silverstripe sites.
+
 
 ## deploynaut server
 
- * SSH Access: `vagrant ssh deploynaut`
+ * SSH Access: `VAGRANT_CWD=deploynaut-vagrant/ vagrant ssh deploynaut`
  * hostname: deploynaut
  * Internal ip address: 10.0.1.2
  * http://localhost:8080/
 
 ## uat server
 
- * SSH Access: `vagrant ssh uat`
+ * SSH Access: `VAGRANT_CWD=deploynaut-vagrant/ vagrant ssh uat`
  * hostname: uat
  * Internal ip address: 10.0.1.3
  * http://localhost:8081/
 
 ## prod
 
- * SSH Access: `vagrant ssh prod`
+ * SSH Access: `VAGRANT_CWD=deploynaut-vagrant/ vagrant ssh prod`
  * hostname: prod
  * Internal ip address: 10.0.1.4
  * http://localhost:8082/
 
-Even though it's more common to use puppet or chef scripts to setup the actual environments, they
-require access to puppet modules or chef recipes and in some cases a working puppet master or chef master.
+## Detailed usage instructions
 
-Ansible provisioning definitions are more condensed and should give a reasonable close representation
-of a puppet or chef provisioning.
-
-## Prerequisites
-
-For Mac OS X you will need:
-
- * Virtualbox
- * Vagrant
- * Ansible
-
-To install on ansible on Mac OS X you can install it in numerous ways, e.g
-
-	sudo pip install ansible
-
-## Installation / Usage
+Step by step instructions to setup a fully working environment
 
     VAGRANT_CWD=ansible/ vagrant up
 
-http://localhost:8080/dev/build
+Dev build [http://localhost:8080/dev/build](http://localhost:8080/dev/build)
 
-http://localhost:8080/admin/naut/
-admin / password
+Go to the admin [http://localhost:8080/admin/naut/](http://localhost:8080/admin/naut/)
 
-Add project:
+The username and password is: `admin` / `password`
+
+Add a new project:
 
 	Project name: myproject
 	Git repository: https://github.com/stojg/sandbox.dev.git
