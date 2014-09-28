@@ -1,8 +1,24 @@
 # Vagrant / Ansible test bench
 
-This folder contains the Ansible provisioning scripts that are with a VagrantFile config in the root
-folder of the project that set up a local development environment.
+This is a SilverStripe module providing virtualbox VMs that sets up development environments for developing the [deploynuat](https://github.com/silverstripe/deploynaut) module.
 
+
+This module contains the Ansible provisioning scripts that used within a `VagrantFile`.
+
+## System requirements
+
+On your development machine you will need:
+
+ * [Virtualbox](https://www.virtualbox.org/)
+ * [Vagrant](https://www.vagrantup.com/)
+ * [Ansible](http://docs.ansible.com/intro_installation.html)
+ 
+## Installation
+
+Install the module with composer
+
+  composer require --dev "silverstripe/deploynaut-vagrant:*"
+  
 On a `vagrant up` and `vagrant provision` it will setup three SS LAMP stacks.
 
 Notice that all vagrant commands have to be prepended with a system environment variable that points to the
