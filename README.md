@@ -120,7 +120,3 @@ Deployment should be successful
 Go to [http://localhost:8081/](http://localhost:8081/)
 
 
-
-
-# Example environment configuration
-
