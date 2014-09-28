@@ -10,7 +10,7 @@ On your development machine you will need:
  * [Vagrant](https://www.vagrantup.com/)
  * [Ansible](http://docs.ansible.com/intro_installation.html)
 
-To install ansible on Mac OS X you can install it in numerous ways, e.g
+You can install ansible via `pip`:
 
 	sudo pip install ansible
  
@@ -20,11 +20,11 @@ It is meant to be installed in a project that already have deploynaut installed,
 
 Install this module to your current deploynaut project with composer:
 
-	$ composer require --dev "silverstripe/deploynaut-vagrant:*"
+	composer require --dev "silverstripe/deploynaut-vagrant:*"
 
 Start the virtual machines from the root of the project from a terminal:
 
-	$ VAGRANT_CWD=deploynaut-vagrant/ vagrant up
+	VAGRANT_CWD=deploynaut-vagrant/ vagrant up
 
 The purpose of using `VAGRANT_CWD` is that we need to run vagrant from the root folder of the project so that it can be mounted over shared volume into the virtual machine.
 
@@ -36,6 +36,7 @@ On `vagrant up` the vagrant will start three virtualbox machines and use ansible
  * hostname: deploynaut
  * Internal ip address: 10.0.1.2
  * http://localhost:8080/
+ * http://localhost:5678/ (resque-web for debugging failing Resque workers)
 
 ## uat server
 
@@ -55,7 +56,7 @@ On `vagrant up` the vagrant will start three virtualbox machines and use ansible
 
 Step by step instructions to setup a fully working environment
 
-    VAGRANT_CWD=ansible/ vagrant up
+	VAGRANT_CWD=ansible/ vagrant up
 
 Dev build [http://localhost:8080/dev/build](http://localhost:8080/dev/build)
 
@@ -110,6 +111,9 @@ Copy paste the following into the  `Deploy config` textarea:
 Click "save"
 
 Click "Check connection", it should report "You appear to have all necessary dependencies installed"
+
+Note: If you are seeing errors about `assets/Capfile` not existing, please ensure the `assets` directory where you
+have installed deploynaut has appropriate permissions.
 
 Go to [project/mytest](http://localhost:8080/naut/project/mytest)
 
