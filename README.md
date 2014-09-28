@@ -17,7 +17,7 @@ On your development machine you will need:
 
 Install the module with composer
 
-  composer require --dev "silverstripe/deploynaut-vagrant:*"
+   composer require --dev "silverstripe/deploynaut-vagrant:*"
   
 On a `vagrant up` and `vagrant provision` it will setup three SS LAMP stacks.
 
