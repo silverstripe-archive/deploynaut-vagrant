@@ -26,14 +26,9 @@ Start the virtual machines from the root of the project from a terminal:
 
 	$ VAGRANT_CWD=deploynaut-vagrant/ vagrant up
 
-> Notice that all vagrant commands have to be prepended with a system environment variable that points to the
-> directory of this folder, i.e.
-> 
->     VAGRANT_CWD=deploynaut-vagrant/ vagrant up
->     VAGRANT_CWD=deploynaut-vagrant/ vagrant provision
+The purpose of using `VAGRANT_CWD` is that we need to run vagrant from the root folder of the project so that it can be mounted over shared volume into the virtual machine.
 
 On `vagrant up` the vagrant will start three virtualbox machines and use ansible to install the necessary software for running one deploynaut site and two generic silverstripe sites.
-
 
 ## deploynaut server
 
