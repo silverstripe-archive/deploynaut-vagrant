@@ -99,6 +99,9 @@ Copy paste the following into the  `Deploy config` textarea:
 	# Set the sake path for this project
 	set :sake_path, "./framework/sake"
 
+	# This is used for sudoing into by asset transfer feature. Make sure your ssh user can run sudo -u www-data ...
+	set :webserver_user, "www-data"
+
 	# This will be used to chown the deployed files, make sure that the deploy user is part of this group
 	set :webserver_group, "sites"
 
