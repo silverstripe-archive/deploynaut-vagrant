@@ -1,0 +1,20 @@
+---
+- name: add sites user
+  user: name=sites state=present group=www-data
+
+- name: set up release folder
+  file: state=directory path=/sites/mysite/releases owner=www-data group=www-data mode=2775
+
+- name: add deploynaut www public key to sites users
+  authorized_key:
+    user=sites
+    key="{{ lookup('file', 'www_id_rsa.pub') }}"
+    manage_dir=yes
+    state=present
+
+- name: set up web _ss_environment.php
+  template: src=sites/mysite/_ss_environment.php.j2 dest=/sites/mysite/_ss_environment.php owner=www-data group=www-data mode=0666
+
+- name: set up sudoers
+  template: src=etc/sudoers.d/10_sites dest=/etc/sudoers.d/10_sites mode=0440
+

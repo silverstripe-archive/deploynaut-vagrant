@@ -1,0 +1,10 @@
+---
+- hosts: all
+  sudo: yes
+  vars:
+    is_deploynaut: false
+  roles:
+  - base
+  - web
+  - ha
+

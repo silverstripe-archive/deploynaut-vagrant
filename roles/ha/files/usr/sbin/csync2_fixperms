@@ -1,0 +1,69 @@
+#!/bin/bash
+
+if [ ! -d "/etc/csync2/perms.d" ] ; then \
+	echo "No permission overrides found"
+	exit 1;
+fi
+
+# For every file in the /etc/csync2/perms.d directory
+for config in /etc/csync2/perms.d/* ; do \
+
+	# Get the permission code for this file (different on BSD/OSX compared to Linux)
+	if stat -c %a "$config" > /dev/null 2>&1 ; then \
+		STAT=`stat -c %a "$config"`
+	else
+		STAT=`stat -f %A "$config"`
+	fi
+
+	# If it's not 600, warn & skip
+	if [ $STAT != 600 ]; then \
+		echo "File $config must have permissions of 600";
+
+	# Otherwise...
+	else
+		# Reset the variables the config file might set, since if we've been through the loop before they'll still
+		# be the values from last time through
+		path=""
+		match=""
+		exclude=""
+		owner=""
+		group=""
+		dirmode=""
+		filemode=""
+		excluderoot=""
+		extra=()
+
+		# Include the configuration file to pull the variables in
+		. "$config"
+
+		# Make sure the configuration file set all the right variables, warn & skip if not
+		if [ -z "$path" ] || [ -z "$owner" ] || [ -z "$group" ] || [ -z "$dirmode" ] || [ -z "$filemode" ] ; then \
+			echo "Parameter missing from file $config"
+		else
+
+			# Make sure $path exists
+			if [ ! -d "$path" ] ; then \
+				echo "$path doesn't exist"
+			else
+
+				# If "excluderoot" isn't empty, _don't_ set perms on $path itself, just all it's descendants
+				if [ -n "$excluderoot" ] ; then \
+					extra=( "${extra[@]}" -not -path "$path" )
+				fi
+
+				if [ -n "$match" ] ; then \
+					extra=( "${extra[@]}" -path "$match" )
+				fi
+
+				if [ -n "$exclude" ] ; then \
+					extra=( "${extra[@]}" -not -path "$exclude" )
+				fi
+
+				# Chown & chmod the path
+				find "$path" -not \( -user "$owner" -group "$group" \) "${extra[@]}" -print0 | xargs -r -0 chown "$owner":"$group"
+				find "$path" -type d -not -perm "$dirmode" "${extra[@]}" -print0 | xargs -r -0 chmod "$dirmode"
+				find "$path" -type f -not -perm "$filemode" "${extra[@]}" -print0 | xargs -r -0 chmod "$filemode"
+			fi
+		fi
+	fi
+done

@@ -1,0 +1,28 @@
+[mysqld]
+wsrep_provider = /usr/lib/galera/libgalera_smm.so
+
+# Does not work - cryptic "Operation not permitted" error.
+# wsrep_sst_method = xtrabackup-v2
+
+wsrep_sst_method = mysqldump
+wsrep_sst_auth = wsrep_sst:123
+
+wsrep_cluster_name = rep
+
+wsrep_cluster_address = gcomm://10.0.1.5:45640,10.0.1.6:45640?pc.wait_prim=no
+wsrep_node_address = {{ ansible_eth1.ipv4.address }}
+wsrep_sst_receive_address = {{ ansible_eth1.ipv4.address }}
+
+wsrep_provider_options = "gmcast.listen_addr=tcp://0.0.0.0:45640;socket.checksum=1"
+
+binlog_format=ROW
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+innodb_locks_unsafe_for_binlog=1
+innodb_doublewrite=1
+innodb_flush_log_at_trx_commit=2
+query_cache_size=0
+query_cache_type=0
+
+[sst]
+progress=1

@@ -1,0 +1,7 @@
+path="/sites/mysite/releases/"
+owner=www-data
+group=www-data
+exclude=*/framework/sake
+# Note: modified from the original to add g+w, so that sites user can deploy.
+filemode=0664
+dirmode=2775

@@ -1,0 +1,9 @@
+---
+- hosts: all
+  sudo: yes
+  vars:
+    document_root: /sites/mysite/www/
+    is_deploynaut: true
+  roles:
+  - base
+  - deploynaut

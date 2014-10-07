@@ -1,0 +1,6 @@
+path="/sites/mysite/releases/"
+owner=www-data
+group=www-data
+match=*/framework/sake
+filemode=0755
+dirmode=2755

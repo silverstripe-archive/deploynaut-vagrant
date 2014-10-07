@@ -1,0 +1,6 @@
+path="/sites/mysite/shared/assets/"
+owner=www-data
+group=www-data
+filemode=0644
+dirmode=2755
+excluderoot=true
