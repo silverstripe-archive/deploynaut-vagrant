@@ -13,6 +13,10 @@ define('SS_DATABASE_NAME', 'deploynaut');
 define('SS_DEFAULT_ADMIN_USERNAME', 'admin');
 define('SS_DEFAULT_ADMIN_PASSWORD', 'password');
 
+global $_FILE_TO_URL_MAPPING;
+$baseDir = realpath(dirname(getcwd()));
+$_FILE_TO_URL_MAPPING[$baseDir] = 'http://localhost';
+
 {% if is_deploynaut | mandatory %}
 define('DEPLOYNAUT_LOG_PATH','/sites/mysite/logs/deploynaut');
 define('DEPLOYNAUT_LOCAL_VCS_PATH', '/sites/mysite/git-clones');
