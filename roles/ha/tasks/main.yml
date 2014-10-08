@@ -1,0 +1,81 @@
+---
+# Install new apt sources for Galera.
+- apt_repository: repo='deb http://mirror.aarnet.edu.au/pub/MariaDB/repo/5.5/debian squeeze main' state=present
+- apt_repository: repo='deb-src http://mirror.aarnet.edu.au/pub/MariaDB/repo/5.5/debian squeeze main' state=present
+- apt_key: url=http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xcbcb082a1bb943db
+# Note: we use mysqldump for SST, xtrabackup-v2 throws cryptic errors - so commenting out for now.
+#- apt_repository: repo='deb http://repo.percona.com/apt squeeze main' state=present
+#- apt_repository: repo='deb-src http://repo.percona.com/apt squeeze main' state=present
+#- apt_key: url=https://www.percona.com/redir/downloads/RPM-GPG-KEY-percona
+
+- name: install mariadb pieces
+  apt: pkg={{ item }} state=latest update_cache=yes
+  with_items:
+    - csync2
+    - mariadb-galera-server
+    - galera
+    - mariadb-client
+    #- percona-xtrabackup
+    #- netcat-openbsd
+    #- pv
+
+- name: set privileges for state snapshot transfer user and flush privileges
+  shell: mysql -e "GRANT ALL ON *.* TO 'wsrep_sst'@'%' IDENTIFIED BY '123'; FLUSH PRIVILEGES;"
+
+- name: Create config directories.
+  file: path={{ item }} state=directory mode=2755
+  with_items:
+    - /etc/csync2
+    - /etc/csync2/post-receive.d
+    - /etc/csync2/perms.d
+
+- name: set up shared config files
+  template: src={{ item }} dest=/{{ item }} mode=0644
+  with_items:
+    - etc/csync2.cfg
+    - etc/csync2/csync2.key
+    - etc/csync2/post-receive.d/10fixperms
+    - etc/cron.d/sitessync
+    - etc/mysql/my.cnf
+
+- name: set up sensitive config files
+  template: src={{ item }} dest=/{{ item }} mode=0600
+  with_items:
+    - etc/csync2/perms.d/site_1_www
+    - etc/csync2/perms.d/site_2_assets
+    - etc/csync2/perms.d/site_3_sake
+
+- name: set up templates for replication
+  template: src={{ item }}.j2 dest=/{{ item }} mode=0644
+  with_items:
+    - etc/mysql/conf.d/galera.cnf
+
+- name: set up csync2 executable files
+  copy: src={{ item }} dest=/{{ item }} mode=0755
+  with_items:
+    - usr/sbin/csync2_sync
+    - usr/bin/wsrep_sst_xtrabackup-v2
+    - usr/sbin/csync2_fixperms
+
+- name: make sure both prod machines can see each other
+  shell: grep 10.0.1.5 /etc/hosts || echo "10.0.1.5 rep1" >> /etc/hosts
+
+- name: make sure both prod machines can see each other
+  shell: grep 10.0.1.6 /etc/hosts || echo "10.0.1.6 rep2" >> /etc/hosts
+
+- name: find out if the mysql is synced yet
+  shell: mysql -NB -e "SHOW STATUS WHERE Variable_name LIKE 'wsrep_local_state_comment'" | cut -f2
+  register: sync_status
+
+- name: shutdown galera, ready for bootstrapping
+  action: service name=mysql state=stopped
+  when: sync_status.stdout != 'Synced'
+
+- name: bootstrap primary node
+  shell: service mysql start --wsrep_new_cluster
+  when: sync_status.stdout != 'Synced' and ha_primary == true
+
+- name: bootstrap secondary nodes
+  shell: service mysql start
+  when: sync_status.stdout != 'Synced' and ha_primary == false
+

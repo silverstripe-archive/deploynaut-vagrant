@@ -1,0 +1,23 @@
+#!/bin/sh
+# Managed by puppet.
+
+if [ -f /sites/*/csync2.disable ]; then
+	echo "Csync2 is disabled"
+	exit
+fi
+
+# Try allocating a lock, and if we get the lock, removing any dirty, running csync2, then fixing any permissions
+flock -n -e /var/run/csync2.lock -c "rm -f /var/run/csync2.dirty && /usr/sbin/csync2 $1 $2 $3 $4 $5 $6"
+
+# If we got the lock and ran, now check if something left a dirty mark while we were running, and re-run if so
+if [ $? -eq 0 ] ; then \
+	if [ -f /var/run/csync2.dirty ] ; then \
+		echo "Re-run"
+		/usr/sbin/csync2_sync $@
+	fi
+
+# Otherwise there's something already running. Leave a dirty mark so running process will re-run after completion
+else
+	touch /var/run/csync2.dirty
+
+fi

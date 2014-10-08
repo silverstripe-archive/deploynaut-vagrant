@@ -1,0 +1,67 @@
+---
+- name: install composer
+  shell: curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer creates=/usr/local/bin/composer
+
+- name: install ruby and rediss
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - ruby1.8
+    - redis-server
+
+- name: install gem capistrano
+  gem: name=capistrano version=2.15.5 state=present user_install=no
+
+- name: install gem capistrano-multiconfig
+  gem: name=capistrano-multiconfig version=0.0.4 state=present user_install=no
+
+- name: install resque gem
+  gem: name=resque state=present user_install=no
+
+- name: symlink gem binaries to /usr/bin
+  file: state=link src=/var/lib/gems/1.8/bin/{{ item }} dest=/usr/bin/{{ item }}
+  with_items:
+    - cap
+    - capify
+    - resque-web
+
+- name: setup the PHP Resque init script
+  template: src=etc/init.d/php-resque dest=/etc/init.d/php-resque mode=0777
+  notify: restart php-resque
+
+- name: Start resque-web at port 5678
+  shell: if ! netstat -nat | grep 5678; then nohup /usr/bin/resque-web > /tmp/resque-web.log & fi;
+
+- name: set up deploynaut _ss_environment.php
+  template: src=sites/mysite/_ss_environment.php.j2 dest=/sites/mysite/_ss_environment.php owner=www-data group=www-data mode=0666
+
+- name: allow www-data to sudo to composer
+  template: src=etc/sudoers.d/10_composer.j2 dest=/etc/sudoers.d/10_composer mode=0440
+
+- name: create deploynaut web folders
+  file: state=directory path=/sites/mysite/{{ item }} owner=www-data group=composer mode=2775
+  with_items:
+    - git-clones
+    - deploynaut-resources/envs
+    - deploynaut-resources/envs/standard
+    - deploynaut-resources/envs/ha
+    - www-keys
+
+- name: copy www ssh keys
+  copy: src=sites/mysite/www-keys/www_{{ item }} dest=/sites/mysite/www-keys/{{ item }} mode=0600 owner=www-data group=www-data
+  with_items:
+    - id_rsa
+    - id_rsa.pub
+  notify: restart apache
+
+- name: copy default environment files
+  template: src={{ item }} dest=/{{ item }} owner=www-data group=composer mode=0664
+  with_items:
+  - sites/mysite/deploynaut-resources/envs/standard/prod.rb
+  - sites/mysite/deploynaut-resources/envs/standard/uat.rb
+  - sites/mysite/deploynaut-resources/envs/ha/prod.rb
+
+- name: dev/build
+  shell: sudo -u www-data php /sites/mysite/www/framework/cli-script.php dev/build flush=1
+
+- name: sync environments
+  shell: sudo -u www-data php /sites/mysite/www/framework/cli-script.php dev/tasks/SyncProjectsAndEnvironments dryrun=0
