@@ -2,6 +2,9 @@
 - name: install composer
   shell: curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer creates=/usr/local/bin/composer
 
+- name: create www-data composer cache folder
+  file: state=directory path=/var/www/.composer owner=www-data group=composer mode=2775
+
 - name: install ruby and rediss
   apt: pkg={{ item }} state=latest
   with_items:
