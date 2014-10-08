@@ -1,6 +1,9 @@
 # The server, either a valid hostname or an IP address and port number
 server '10.0.1.3:22', :web, :db
 
+# Dummy deploy target to catch capistrano erroneously trying to execute on role-less, no-deploy hosts.
+server '10.0.1.254:22', :unused
+
 # Set your application name here, used as the base folder
 set :application, "mysite"
 
