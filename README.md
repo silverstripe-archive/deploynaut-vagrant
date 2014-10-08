@@ -80,7 +80,7 @@ Step by step instructions to setup a fully working environment
 
 	VAGRANT_CWD=ansible/ vagrant up
 
-Go to the admin [http://localhost:8080/admin/naut/](http://localhost:8080/admin/naut/)
+Go to the admin [http://localhost:8102/admin/naut/](http://localhost:8102/admin/naut/)
 
 The username and password is: `admin` / `password`
 
@@ -88,7 +88,7 @@ Configure a git repository where needed, e.g. `https://github.com/stojg/sandbox.
 
 You can click "Check connection", it should report "You appear to have all necessary dependencies installed"
 
-Go to [project/mytest](http://localhost:8080/) and deploy to the selected environment. The site should be up now.
+Go to [project/mytest](http://localhost:8102/) and deploy to the selected environment. The site should be up now.
 
 ## FAQ
 
