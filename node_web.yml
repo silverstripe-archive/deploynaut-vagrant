@@ -4,5 +4,6 @@
   vars:
     is_deploynaut: false
   roles:
-  - base
-  - web
+    - base
+    - mysql-server
+    - web

@@ -1,0 +1,6 @@
+---
+- name: install mysql server package
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - mysql-server
+  notify: restart mysql
