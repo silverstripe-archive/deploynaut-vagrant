@@ -68,3 +68,16 @@
 
 - name: sync environments
   shell: sudo -u www-data php /sites/mysite/www/framework/cli-script.php dev/tasks/SyncProjectsAndEnvironments dryrun=0
+
+- name: configure git repos
+  shell: mysql -e "UPDATE deploynaut.DNProject SET CVSPath='https://github.com/stojg/sandbox.dev.git' WHERE Name='{{ item }}';"
+  with_items:
+  - ha
+  - standard
+
+# Note this does not support key-based cloning - the repo has to be public.
+- name: clone environments
+  shell: if [ ! -d /sites/mysite/git-clones/{{ item }} ]; then sudo -u www-data git clone --bare -q https://github.com/stojg/sandbox.dev.git /sites/mysite/git-clones/{{ item }}; fi
+  with_items:
+  - ha
+  - standard
