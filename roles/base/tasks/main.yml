@@ -1,6 +1,7 @@
 ---
 - apt: pkg={{ item }} state=latest
   with_items:
+    - ntp
     - vim
     - git
     - tar
