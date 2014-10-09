@@ -65,3 +65,6 @@ server "10.0.1.5", :app, :web, :db, {
 }
 
 server "10.0.1.6", :app, :web, :db
+
+# Dummy deploy target to catch capistrano erroneously trying to execute on role-less, no-deploy hosts.
+server '10.0.1.254:22', :unused
