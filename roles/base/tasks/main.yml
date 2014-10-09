@@ -1,5 +1,6 @@
 ---
-- apt: pkg={{ item }} state=latest
+- name: install base packages
+  apt: pkg={{ item }} state=latest
   with_items:
     - ntp
     - vim
@@ -7,7 +8,6 @@
     - tar
     - apache2
     - php5
-    - mysql-server
 
 - name: install apache modules
   apache2_module: state=present name={{ item }}
@@ -19,21 +19,17 @@
     - filter
   notify: restart apache
 
-- name: install php5 Packages
+- name: install php5 packages
   sudo: yes
   apt: pkg={{ item }} state=present
   with_items:
-    - "php-apc"
-    - "php5-cli"
-    - "php5-curl"
-    - "php5-imagick"
-    - "php5-gd"
-    - "php5-imap"
-    - "php5-ldap"
-    - "php5-mcrypt"
-    - "php5-tidy"
-    - "php5-mysql"
-    - "php5-sqlite"
+    - php-apc
+    - php5-cli
+    - php5-curl
+    - php5-gd
+    - php5-mcrypt
+    - php5-tidy
+    - php5-mysql
   notify: restart apache
 
 - name: create web folders
