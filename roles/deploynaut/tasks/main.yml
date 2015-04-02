@@ -12,7 +12,7 @@
     - redis-server
 
 - name: install gem capistrano
-  gem: name=capistrano version=2.15.5 state=present user_install=no
+  gem: name=capistrano version=2.15.5 state=present user_install=no force=yes
 
 - name: install gem capistrano-multiconfig
   gem: name=capistrano-multiconfig version=0.0.4 state=present user_install=no
