@@ -11,7 +11,7 @@ set :application, "mysite"
 set :deploy_to, "/sites/#{application}"
 
 # Set a build script that is run before the code .tar.gz is sent to the server
-set :build_script, "composer install --prefer-dist --no-dev"
+set :build_script, "composer install --prefer-dist --no-dev --no-progress"
 
 # Set the sake path for this project
 set :sake_path, "./framework/sake"
