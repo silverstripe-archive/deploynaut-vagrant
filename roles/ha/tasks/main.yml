@@ -13,7 +13,7 @@
   with_items:
     - csync2
     - mariadb-galera-server
-    - galera
+    #- galera # mariadb-galera-server will install that. Moreover it depends on galera3.
     - mariadb-client
     #- percona-xtrabackup
     #- netcat-openbsd
