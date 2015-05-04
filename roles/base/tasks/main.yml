@@ -6,8 +6,10 @@
     - vim
     - git
     - tar
+    - curl
     - apache2
     - php5
+    - python-software-properties
 
 - name: install apache modules
   apache2_module: state=present name={{ item }}
@@ -74,4 +76,3 @@
 
 - name: download sspak
   get_url: url=http://silverstripe.github.io/sspak/sspak.phar dest=/usr/bin/sspak mode=0777
-

@@ -8,7 +8,7 @@
 - name: install ruby and rediss
   apt: pkg={{ item }} state=latest
   with_items:
-    - ruby1.8
+    - ruby
     - redis-server
 
 - name: install gem capistrano
@@ -21,7 +21,7 @@
   gem: name=resque state=present user_install=no
 
 - name: symlink gem binaries to /usr/bin
-  file: state=link src=/var/lib/gems/1.8/bin/{{ item }} dest=/usr/bin/{{ item }}
+  file: state=link src=/usr/local/bin/{{ item }} dest=/usr/bin/{{ item }}
   with_items:
     - cap
     - capify

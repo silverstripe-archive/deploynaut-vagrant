@@ -16,38 +16,37 @@ SCRIPT
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+	# A apt-get cache plugin for vagrant can be installed via http://fgrehm.viewdocs.io/vagrant-cachier
+	config.vm.box = "debian_wheezy_7_8"
+	config.vm.box_url = "http://tools.silverstripe.com/vagrant/debian_wheezy_7_8_minimal.box"
 
-    config.vm.box = "debian_squeeze_6_0_3"
-    config.vm.box_url = "http://tools.silverstripe.com/vagrant/squeeze.box"
-    # A apt-get cache plugin for vagrant can be installed via http://fgrehm.viewdocs.io/vagrant-cachier
-
-    config.vm.provider "virtualbox" do |v|
+	config.vm.provider "virtualbox" do |v|
 		v.memory = 512
 		v.cpus = 1
-    end
-    
-    config.vm.define "deploynaut" do |deploynaut|
-        deploynaut.vm.hostname = "deploynaut"
-        deploynaut.vm.network "private_network", ip: "10.0.1.2"
-        deploynaut.vm.network "forwarded_port", guest: 80, host: 8102
-        deploynaut.vm.network "forwarded_port", guest: 5678, host: 5678
+	end
+
+	config.vm.define "deploynaut" do |deploynaut|
+		deploynaut.vm.hostname = "deploynaut"
+		deploynaut.vm.network "private_network", ip: "10.0.1.2"
+		deploynaut.vm.network "forwarded_port", guest: 80, host: 8102
+		deploynaut.vm.network "forwarded_port", guest: 5678, host: 5678
 		deploynaut.vm.synced_folder "../", "/sites/mysite/www", owner: "www-data", group: "www-data"
 		deploynaut.vm.provision "ansible", playbook: "node_deploynaut.yml"
-    end
+	end
 
-    config.vm.define "uat" do |uat|
-        uat.vm.hostname = "uat"
-        uat.vm.network "private_network", ip: "10.0.1.3"
-        uat.vm.network "forwarded_port", guest: 80, host: 8103
+	config.vm.define "uat" do |uat|
+		uat.vm.hostname = "uat"
+		uat.vm.network "private_network", ip: "10.0.1.3"
+		uat.vm.network "forwarded_port", guest: 80, host: 8103
 		uat.vm.provision "ansible", playbook: "node_web.yml"
-    end
+	end
 
-    config.vm.define "prod" do |prod|
-        prod.vm.hostname = "prod"
-        prod.vm.network "private_network", ip: "10.0.1.4"
-        prod.vm.network "forwarded_port", guest: 80, host: 8104
+	config.vm.define "prod" do |prod|
+		prod.vm.hostname = "prod"
+		prod.vm.network "private_network", ip: "10.0.1.4"
+		prod.vm.network "forwarded_port", guest: 80, host: 8104
 		prod.vm.provision "ansible", playbook: "node_web.yml"
-    end
+	end
 
 	config.vm.define "rep1" do |rep1|
 		rep1.vm.hostname = "rep1"

@@ -1,7 +1,7 @@
 ---
 # Install new apt sources for Galera.
-- apt_repository: repo='deb http://mirror.aarnet.edu.au/pub/MariaDB/repo/5.5/debian squeeze main' state=present
-- apt_repository: repo='deb-src http://mirror.aarnet.edu.au/pub/MariaDB/repo/5.5/debian squeeze main' state=present
+- apt_repository: repo='deb http://mirror.aarnet.edu.au/pub/MariaDB/repo/5.5/debian wheezy main' state=present
+- apt_repository: repo='deb-src http://mirror.aarnet.edu.au/pub/MariaDB/repo/5.5/debian wheezy main' state=present
 - apt_key: url=http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xcbcb082a1bb943db
 # Note: we use mysqldump for SST, xtrabackup-v2 throws cryptic errors - so commenting out for now.
 #- apt_repository: repo='deb http://repo.percona.com/apt squeeze main' state=present
