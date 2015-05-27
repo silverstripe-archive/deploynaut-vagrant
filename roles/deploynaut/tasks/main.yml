@@ -28,8 +28,16 @@
     - resque-web
 
 - name: setup the PHP Resque init script
-  template: src=etc/init.d/php-resque dest=/etc/init.d/php-resque mode=0777
+  template: src=etc/init.d/php-resque dest=/etc/init.d/php-resque mode=0755
   notify: restart php-resque
+
+- name: install the pipecheck script
+  template: src=bin/pipecheck dest=/usr/local/bin/pipecheck owner=root group=root mode=0755
+  notify: restart deploynaut-pipelines
+
+- name: setup the Deploynaut Pipelines init script
+  template: src=etc/init.d/deploynaut-pipelines dest=/etc/init.d/deploynaut-pipelines owner=root group=root mode=0755
+  notify: restart deploynaut-pipelines
 
 - name: Start resque-web at port 5678
   shell: if ! netstat -nat | grep 5678; then nohup /usr/bin/resque-web > /tmp/resque-web.log & fi;
