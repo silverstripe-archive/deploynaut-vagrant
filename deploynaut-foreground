@@ -1,0 +1,24 @@
+#!/bin/bash  
+echo "Starting MySQL..."
+/etc/init.d/mysql start
+
+echo "Starting Redis..."
+/etc/init.d/redis-server start
+
+echo "Starting PHP resque workers..."
+/etc/init.d/php-resque start
+
+echo "Starting Resque-web..."
+if ! netstat -nat | grep 5678; then nohup /usr/local/bin/resque-web > /tmp/resque-web.log & fi
+
+echo "Running dev/build..."
+sudo -u www-data ./framework/sake dev/build
+
+echo "Creating environments"
+/usr/local/bin/create-deploynaut-envs
+
+echo "Starting apache..."
+apache2ctl start
+
+echo "Showing access.log..."
+tail -f /var/log/apache2/access.log

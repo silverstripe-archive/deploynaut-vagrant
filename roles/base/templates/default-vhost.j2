@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+
+	LogLevel warn
+
+	ErrorLog /var/log/apache.error.log
+	CustomLog /var/log/apache.access.log combined
+
+	<LocationMatch assets/>
+		php_flag engine off
+	</LocationMatch>
+
+    <Directory /var/www/html>
+		Options +FollowSymLinks
+		Options -ExecCGI -Includes -Indexes
+		AllowOverride all
+		Order allow,deny
+		Allow from All
+    </Directory>
+
+</VirtualHost>

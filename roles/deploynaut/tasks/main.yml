@@ -20,72 +20,35 @@
 - name: install resque gem
   gem: name=resque state=present user_install=no
 
-- name: symlink gem binaries to /usr/bin
-  file: state=link src=/usr/local/bin/{{ item }} dest=/usr/bin/{{ item }}
-  with_items:
-    - cap
-    - capify
-    - resque-web
-
 - name: setup the PHP Resque init script
-  template: src=etc/init.d/php-resque dest=/etc/init.d/php-resque mode=0755
-  notify: restart php-resque
-
-- name: install the pipecheck script
-  template: src=bin/pipecheck dest=/usr/local/bin/pipecheck owner=root group=root mode=0755
-  notify: restart deploynaut-pipelines
-
-- name: setup the Deploynaut Pipelines init script
-  template: src=etc/init.d/deploynaut-pipelines dest=/etc/init.d/deploynaut-pipelines owner=root group=root mode=0755
-  notify: restart deploynaut-pipelines
-
-- name: Start resque-web at port 5678
-  shell: if ! netstat -nat | grep 5678; then nohup /usr/bin/resque-web > /tmp/resque-web.log & fi;
+  template: src=etc/init.d/php-resque dest=/etc/init.d/php-resque mode=0777
 
 - name: set up deploynaut _ss_environment.php
-  template: src=sites/mysite/_ss_environment.php.j2 dest=/sites/mysite/_ss_environment.php owner=www-data group=www-data mode=0666
+  template: src=_ss_environment.php.j2 dest=/var/www/_ss_environment.php owner=www-data group=www-data mode=0666
 
 - name: allow www-data to sudo to composer
   template: src=etc/sudoers.d/10_composer.j2 dest=/etc/sudoers.d/10_composer mode=0440
 
 - name: create deploynaut web folders
-  file: state=directory path=/sites/mysite/{{ item }} owner=www-data group=composer mode=2775
+  file: state=directory path=/var/www/{{ item }} owner=www-data group=composer mode=2775
   with_items:
     - git-clones
     - deploynaut-resources/envs
-    - deploynaut-resources/envs/standard
-    - deploynaut-resources/envs/ha
     - www-keys
 
+- name: create ~www-data/.ssh
+  file: state=directory path=/var/www/.ssh owner=www-data group=www-data mode=2750
+
 - name: copy www ssh keys
-  copy: src=sites/mysite/www-keys/www_{{ item }} dest=/sites/mysite/www-keys/{{ item }} mode=0600 owner=www-data group=www-data
+  copy: src=www-keys/www_{{ item }} dest=/var/www/www-keys/{{ item }} mode=0600 owner=www-data group=www-data
   with_items:
     - id_rsa
     - id_rsa.pub
-  notify: restart apache
 
-- name: copy default environment files
-  template: src={{ item }} dest=/{{ item }} owner=www-data group=composer mode=0664
-  with_items:
-  - sites/mysite/deploynaut-resources/envs/standard/prod.rb
-  - sites/mysite/deploynaut-resources/envs/standard/uat.rb
-  - sites/mysite/deploynaut-resources/envs/ha/prod.rb
-
-- name: dev/build
-  shell: sudo -u www-data php /sites/mysite/www/framework/cli-script.php dev/build flush=1
-
-- name: sync environments
-  shell: sudo -u www-data php /sites/mysite/www/framework/cli-script.php dev/tasks/SyncProjectsAndEnvironments dryrun=0
-
-- name: configure git repos
-  shell: mysql -e "UPDATE deploynaut.DNProject SET CVSPath='https://github.com/stojg/sandbox.dev.git' WHERE Name='{{ item }}';"
-  with_items:
-  - ha
-  - standard
 
 # Note this does not support key-based cloning - the repo has to be public.
 - name: clone environments
-  shell: if [ ! -d /sites/mysite/git-clones/{{ item }} ]; then sudo -u www-data git clone --bare -q https://github.com/stojg/sandbox.dev.git /sites/mysite/git-clones/{{ item }}; fi
+  shell: if [ ! -d /var/www/git-clones/{{ item }} ]; then sudo -u www-data git clone --bare -q https://github.com/stojg/sandbox.dev.git /var/www/git-clones/{{ item }}; fi
   with_items:
   - ha
   - standard

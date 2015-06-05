@@ -2,7 +2,7 @@
 - hosts: all
   sudo: yes
   vars:
-    document_root: /sites/mysite/www/
+    document_root: /var/www/html
     is_deploynaut: true
   roles:
     - base

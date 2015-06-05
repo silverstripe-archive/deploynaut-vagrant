@@ -3,7 +3,16 @@
   user: name=sites state=present group=www-data
 
 - name: set up release folder
-  file: state=directory path=/sites/mysite/releases owner=www-data group=www-data mode=2775
+  file: state=directory path=/var/www/releases owner=sites group=www-data mode=2775
+
+- name: /var/www owned by sites
+  command: chown sites:www-data /var/www
+
+- name: remove /var/www/html for capistrano releases
+  command: mv /var/www/html /var/www/releases/legacy
+
+- name: set up symlink /var/www/html for capistrano releases
+  command: sudo -u sites ln -s /var/www/releases/legacy /var/www/html
 
 - name: add deploynaut www public key to sites users
   authorized_key:
@@ -13,7 +22,7 @@
     state=present
 
 - name: set up web _ss_environment.php
-  template: src=sites/mysite/_ss_environment.php.j2 dest=/sites/mysite/_ss_environment.php owner=www-data group=www-data mode=0666
+  template: src=sites/mysite/_ss_environment.php.j2 dest=/var/www/_ss_environment.php owner=www-data group=www-data mode=0666
 
 - name: set up sudoers
   template: src=etc/sudoers.d/10_sites dest=/etc/sudoers.d/10_sites mode=0440

@@ -1,0 +1,23 @@
+FROM ansible/ubuntu14.04-ansible
+MAINTAINER Sam Minnee <sam@silverstripe.com>
+
+### SET UP
+
+ADD roles /tmp/roles
+ADD node_deploynaut.yml /tmp/node.yml
+
+RUN cd /tmp && ansible-playbook node.yml -c local
+
+ADD deploynaut-foreground /usr/local/bin/deploynaut-foreground
+ADD create-deploynaut-envs /usr/local/bin/create-deploynaut-envs
+ADD env-template.rb /tmp/env-template.rb
+
+####
+## Commands and ports	
+EXPOSE 22
+EXPOSE 80
+EXPOSE 5678
+
+# Run apache in foreground mode, because Docker needs a foreground
+WORKDIR /var/www/html
+CMD ["/usr/local/bin/deploynaut-foreground"]

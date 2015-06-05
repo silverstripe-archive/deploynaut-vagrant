@@ -1,0 +1,44 @@
+#!/usr/bin/env php
+<?php
+
+$ENV_BASE = '/var/www/deploynaut-resources/envs/';
+$HTTP_BASE = '/var/www/html/';
+$ENV_TEMPLATE = '/tmp/env-template.rb';
+
+// Get list of environment details
+$env = array();
+foreach(explode("\n", trim(`set`)) as $line) {
+	if(!trim($line) || strpos($line, "=") === false) {
+		continue;
+	}
+	list($k,$v) = explode("=", $line, 2);
+	$v = preg_replace('/^\'|\'$/', '', $v);
+
+
+
+	// To do: add a pattern match: e.g. ENV_<STANDARD>_<UAT>_PORT
+	if(preg_match('/^ENV_([^_]+)_([^_]+)_PORT$/', $k, $matches)) {
+		$env = strtolower($matches[1]).'/'.strtolower($matches[2]);
+		$envs[$env.'.rb'] = str_replace('tcp://', '', $v);
+	}
+}
+
+print_r($envs);
+$template = file_get_contents($ENV_TEMPLATE);
+
+// Create ruby files
+foreach($envs as $env => $ssh) {
+	$dir = dirname($ENV_BASE.$env);
+	if(!is_dir($dir)) {
+		mkdir($dir, 0777, true);
+	}
+	$populatedTemplate = str_replace('$SSH_ADDR', $ssh, $template);
+	file_put_contents($ENV_BASE.$env, $populatedTemplate);
+}
+
+// Run sync script
+chdir($HTTP_BASE);
+passthru("./framework/sake dev/tasks/SyncProjectsAndEnvironments dryrun=0");
+
+// Update repo paths
+passthru("mysql -e \"UPDATE deploynaut.DNProject SET CVSPath='https://github.com/stojg/sandbox.dev.git'\"");

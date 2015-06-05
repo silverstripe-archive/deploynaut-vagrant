@@ -10,6 +10,8 @@
     - apache2
     - php5
     - python-software-properties
+    - curl
+    - openssh-server
 
 - name: install apache modules
   apache2_module: state=present name={{ item }}
@@ -19,7 +21,6 @@
     - headers
     - expires
     - filter
-  notify: restart apache
 
 - name: install php5 packages
   sudo: yes
@@ -32,17 +33,15 @@
     - php5-mcrypt
     - php5-tidy
     - php5-mysql
-  notify: restart apache
 
 - name: create web folders
-  file: state=directory path=/sites/mysite/{{ item }} owner=www-data group=www-data mode=2775
+  file: state=directory path=/var/www/{{ item }} owner=www-data group=www-data mode=2775
   with_items:
     - logs
     - shared/assets
 
 - name: set default vhost
-  template: src=etc/apache2/sites-available/default.j2 dest=/etc/apache2/sites-available/default
-  notify: restart apache
+  template: src=default-vhost.j2 dest=/etc/apache2/sites-available/000-default.conf
 
 - name: add composer group
   group: name=composer state=present
@@ -58,21 +57,18 @@
   with_items:
     - apache2
     - cli
-  notify: restart apache
 
 - name: php.display_startup_errors = on
   ini_file: dest=/etc/php5/{{ item }}/php.ini section=PHP option=display_startup_errors value="On" backup=yes state=present
   with_items:
     - apache2
     - cli
-  notify: restart apache
 
 - name: php.suhosin allow .phar files
   ini_file: dest=/etc/php5/{{ item }}/php.ini section=suhosin option=suhosin.executor.include.whitelist value=phar state=present
   with_items:
     - apache2
     - cli
-  notify: restart apache
 
 - name: download sspak
   get_url: url=http://silverstripe.github.io/sspak/sspak.phar dest=/usr/bin/sspak mode=0777

@@ -1,0 +1,20 @@
+FROM ansible/ubuntu14.04-ansible
+MAINTAINER Sam Minnee <sam@silverstripe.com>
+
+### SET UP
+
+ADD roles /tmp/roles
+ADD node_web.yml /tmp/node.yml
+
+RUN cd /tmp && ansible-playbook node.yml -c local
+
+ADD apache-foreground /usr/local/bin/apache-foreground
+
+####
+## Commands and ports	
+EXPOSE 22
+EXPOSE 80
+
+# Run apache in foreground mode, because Docker needs a foreground
+WORKDIR /var/www/html
+CMD ["/usr/local/bin/apache-foreground"]
