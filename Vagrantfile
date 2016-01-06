@@ -17,8 +17,8 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# A apt-get cache plugin for vagrant can be installed via http://fgrehm.viewdocs.io/vagrant-cachier
-	config.vm.box = "debian_wheezy_7_8"
-	config.vm.box_url = "http://tools.silverstripe.com/vagrant/debian_wheezy_7_8_minimal.box"
+	config.vm.box = "silverstripe-platform/virtualbox-debian-wheezy"
+	config.vm.box_url = "https://ss-packages.s3.amazonaws.com/virtualbox-debian-wheezy_2015-11-04_22-05.box"
 
 	config.vm.provider "virtualbox" do |v|
 		v.memory = 512
