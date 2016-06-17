@@ -1,4 +1,9 @@
 ---
+- name: reload systemd
+  become: yes
+  become_user: root
+  command: /bin/systemctl daemon-reload
+
 - name: restart php-resque
   service: name=php-resque enabled=yes state=restarted
 

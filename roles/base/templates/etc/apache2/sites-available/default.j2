@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 <VirtualHost *:80>
-    ServerAdmin webmaster@localhost
-    DocumentRoot /sites/mysite/www
+	ServerAdmin webmaster@localhost
+	DocumentRoot /sites/mysite/www
 
 	LogLevel warn
 
@@ -12,12 +12,10 @@
 		php_flag engine off
 	</LocationMatch>
 
-    <Directory /sites/mysite/www>
+	<Directory /sites/mysite/www>
 		Options +FollowSymLinks
 		Options -ExecCGI -Includes -Indexes
 		AllowOverride all
-		Order allow,deny
-		Allow from All
-    </Directory>
-
+		Require all granted
+	</Directory>
 </VirtualHost>
