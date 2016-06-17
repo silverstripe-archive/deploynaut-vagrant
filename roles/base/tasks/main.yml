@@ -33,7 +33,7 @@
     - php5-ldap
     - php5-mcrypt
     - php5-tidy
-    - php5-mysql
+    - php5-mysqlnd
     - php5-xmlrpc
     - php5-xsl
     - php5-intl
