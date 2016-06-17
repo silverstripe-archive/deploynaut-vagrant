@@ -12,7 +12,7 @@
     - python-software-properties
 
 - name: install apache modules
-  apache2_module: state=present name={{ item }}
+  apache2_module: name={{ item }} state=present
   with_items:
     - rewrite
     - vhost_alias
@@ -24,7 +24,7 @@
 - name: install php5 packages
   become: yes
   become_user: root
-  apt: pkg={{ item }} state=present
+  apt: pkg={{ item }} state=latest
   with_items:
     - php5-cli
     - php5-curl
