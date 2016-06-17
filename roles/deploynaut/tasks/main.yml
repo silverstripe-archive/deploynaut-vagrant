@@ -32,7 +32,9 @@
 
 - name: setup the PHP Resque init script
   template: src=etc/init.d/php-resque dest=/etc/init.d/php-resque mode=0755
-  notify: restart php-resque
+  notify:
+    - reload systemd
+    - restart php-resque
 
 - name: install the pipecheck script
   template: src=bin/pipecheck dest=/usr/local/bin/pipecheck owner=root group=root mode=0755
@@ -40,7 +42,9 @@
 
 - name: setup the Deploynaut Pipelines init script
   template: src=etc/init.d/deploynaut-pipelines dest=/etc/init.d/deploynaut-pipelines owner=root group=root mode=0755
-  notify: restart deploynaut-pipelines
+  notify:
+    - reload systemd
+    - restart deploynaut-pipelines
 
 - name: Start resque-web at port 5678
   shell: if ! netstat -nat | grep 5678; then nohup /usr/bin/resque-web > /tmp/resque-web.log & fi;
@@ -75,10 +79,14 @@
   - sites/mysite/deploynaut-resources/envs/ha/prod.rb
 
 - name: dev/build
-  shell: sudo -u www-data php /sites/mysite/www/framework/cli-script.php dev/build flush=1
+  become: yes
+  become_user: www-data
+  shell: php /sites/mysite/www/framework/cli-script.php dev/build flush=1
 
 - name: sync environments
-  shell: sudo -u www-data php /sites/mysite/www/framework/cli-script.php dev/tasks/SyncProjectsAndEnvironments dryrun=0
+  become: yes
+  become_user: www-data
+  shell: php /sites/mysite/www/framework/cli-script.php dev/tasks/SyncProjectsAndEnvironments dryrun=0
 
 - name: configure git repos
   shell: mysql -e "UPDATE deploynaut.DNProject SET CVSPath='https://github.com/stojg/sandbox.dev.git' WHERE Name='{{ item }}';"

@@ -3,12 +3,9 @@
 
 # Will ensure that python is installed so that ansible can provision the servers
 $install_pyton = <<SCRIPT
-if [ "$[$(date +%s) - $(stat -c %Z /var/cache/apt/)]" -ge 6000000 ]; then
-	echo "apt cache is older than 1 hr, updating"
-	apt-get update
-fi
 if [ ! -f /usr/bin/python ]; then
 	echo "Installing python for ansible"
+	apt-get -q update
 	apt-get install -q -y python
 fi
 SCRIPT
@@ -17,8 +14,8 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# A apt-get cache plugin for vagrant can be installed via http://fgrehm.viewdocs.io/vagrant-cachier
-	config.vm.box = "silverstripe-platform/virtualbox-debian-wheezy"
-	config.vm.box_url = "https://ss-packages.s3.amazonaws.com/virtualbox-debian-wheezy_2015-11-04_22-05.box"
+	config.vm.box = "halkyon/debian-jessie-amd64"
+	config.vm.box_url = "https://halkyon.net/vagrant/debian-jessie-minimal-amd64.box"
 
 	config.vm.provider "virtualbox" do |v|
 		v.memory = 512

@@ -1,10 +1,10 @@
 ---
 - hosts: all
-  sudo: yes
+  become: yes
+  become_user: root
   vars:
     is_deploynaut: false
   roles:
   - base
   - web
   - ha
-
