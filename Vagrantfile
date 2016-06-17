@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 # Will ensure that python is installed so that ansible can provision the servers
-$install_pyton = <<SCRIPT
+$install_python = <<SCRIPT
 if [ ! -f /usr/bin/python ]; then
 	echo "Installing python for ansible"
 	apt-get -q update
@@ -59,5 +59,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		rep2.vm.provision "ansible", playbook: "node_ha.yml", extra_vars: { ha_primary: false }
 	end
 
-	config.vm.provision "shell", inline: $install_pyton
+	config.vm.provision "shell", inline: $install_python
 end
