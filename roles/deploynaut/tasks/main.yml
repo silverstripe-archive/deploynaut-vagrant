@@ -11,11 +11,11 @@
     - ruby
     - redis-server
 
-- name: install gem net-ssh at outdated version for ruby 1.9
-  gem: name=net-ssh version=2.9.2 state=present user_install=no
+- name: install gem net-ssh
+  gem: name=net-ssh version=3.1.1 state=present user_install=no
 
 - name: install gem capistrano
-  gem: name=capistrano version=2.15.5 state=present user_install=no
+  gem: name=capistrano version=2.15.7 state=present user_install=no
 
 - name: install gem capistrano-multiconfig
   gem: name=capistrano-multiconfig version=0.0.4 state=present user_install=no
