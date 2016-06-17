@@ -1,23 +1,14 @@
 ---
-# Install new apt sources for Galera.
 - apt_repository: repo='deb http://mirror.aarnet.edu.au/pub/MariaDB/repo/10.0/debian jessie main' state=present
 - apt_repository: repo='deb-src http://mirror.aarnet.edu.au/pub/MariaDB/repo/10.0/debian jessie main' state=present
 - apt_key: url=http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xcbcb082a1bb943db
-# Note: we use mysqldump for SST, xtrabackup-v2 throws cryptic errors - so commenting out for now.
-#- apt_repository: repo='deb http://repo.percona.com/apt squeeze main' state=present
-#- apt_repository: repo='deb-src http://repo.percona.com/apt squeeze main' state=present
-#- apt_key: url=https://www.percona.com/redir/downloads/RPM-GPG-KEY-percona
 
 - name: install mariadb pieces
   apt: pkg={{ item }} state=latest update_cache=yes
   with_items:
     - csync2
     - mariadb-galera-server
-    #- galera # mariadb-galera-server will install that. Moreover it depends on galera3.
     - mariadb-client
-    #- percona-xtrabackup
-    #- netcat-openbsd
-    #- pv
 
 - name: set privileges for state snapshot transfer user and flush privileges
   shell: mysql -e "GRANT ALL ON *.* TO 'wsrep_sst'@'%' IDENTIFIED BY '123'; FLUSH PRIVILEGES;"
@@ -54,7 +45,6 @@
   copy: src={{ item }} dest=/{{ item }} mode=0755
   with_items:
     - usr/sbin/csync2_sync
-    - usr/bin/wsrep_sst_xtrabackup-v2
     - usr/sbin/csync2_fixperms
 
 - name: make sure both prod machines can see each other
@@ -78,4 +68,3 @@
 - name: start secondary node
   shell: service mysql start
   when: sync_status.stdout != 'Synced' and ha_primary == false
-
