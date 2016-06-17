@@ -72,10 +72,10 @@
   when: sync_status.stdout != 'Synced'
 
 - name: bootstrap primary node
-  shell: service mysql start --wsrep_new_cluster
+  shell: service mysql bootstrap
   when: sync_status.stdout != 'Synced' and ha_primary == true
 
-- name: bootstrap secondary nodes
+- name: start secondary node
   shell: service mysql start
   when: sync_status.stdout != 'Synced' and ha_primary == false
 
