@@ -11,6 +11,12 @@
     - ruby
     - redis-server
 
+- name: install gem rubygems-update
+  gem: name=rubygems-update version=2.6.6 state=present user_install=no
+
+- name: install latest rubygems
+  shell: update_rubygems
+
 - name: install gem net-ssh
   gem: name=net-ssh version=3.1.1 state=present user_install=no
 
